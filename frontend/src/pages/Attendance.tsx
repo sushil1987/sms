@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useAuthStore } from '../store/authStore';
 import type { ClassSection, PaginatedResponse } from '../types';
-import './Forms.css';
-import './ResourceList.css';
+import PageHeader from '../components/ui/PageHeader';
+import '../components/ui/DataTable.css';
 
 interface AttendanceSheet {
   date: string;
@@ -74,10 +74,8 @@ export default function Attendance() {
   });
 
   return (
-    <div className="resource-page">
-      <header className="page-header">
-        <h1>Attendance</h1>
-      </header>
+    <div>
+      <PageHeader title="Attendance" subtitle="Mark daily attendance and view reports" />
 
       <div className="tabs">
         <button type="button" className={tab === 'mark' ? 'active' : ''} onClick={() => setTab('mark')}>Mark Attendance</button>

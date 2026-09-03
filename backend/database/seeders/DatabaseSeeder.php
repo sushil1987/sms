@@ -3,9 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\AcademicYear;
+use App\Models\Announcement;
 use App\Models\Attendance;
 use App\Models\ClassSection;
 use App\Models\Enrollment;
+use App\Models\FeePayment;
+use App\Models\FeeStructure;
 use App\Models\Grade;
 use App\Models\Role;
 use App\Models\Student;
@@ -31,7 +34,7 @@ class DatabaseSeeder extends Seeder
         $teacherRole = $roles->firstWhere('slug', 'teacher');
         $studentRole = $roles->firstWhere('slug', 'student');
 
-        User::create([
+        $admin = User::create([
             'name' => 'System Admin',
             'email' => 'admin@school.local',
             'password' => Hash::make('password'),
@@ -125,13 +128,15 @@ class DatabaseSeeder extends Seeder
             'room' => 'Room 101',
         ]);
 
-        Attendance::create([
-            'student_id' => $student->id,
-            'class_section_id' => $classSection->id,
-            'date' => now()->toDateString(),
-            'status' => 'present',
-            'recorded_by' => $teacherUser->id,
-        ]);
+        for ($i = 0; $i < 10; $i++) {
+            Attendance::create([
+                'student_id' => $student->id,
+                'class_section_id' => $classSection->id,
+                'date' => now()->subDays($i)->toDateString(),
+                'status' => $i % 5 === 0 ? 'absent' : 'present',
+                'recorded_by' => $teacherUser->id,
+            ]);
+        }
 
         Grade::create([
             'student_id' => $student->id,
@@ -143,6 +148,59 @@ class DatabaseSeeder extends Seeder
             'max_score' => 100,
             'grade_letter' => 'B',
             'recorded_by' => $teacherUser->id,
+        ]);
+
+        Grade::create([
+            'student_id' => $student->id,
+            'subject_id' => $english->id,
+            'class_section_id' => $classSection->id,
+            'academic_year_id' => $academicYear->id,
+            'exam_type' => 'Midterm',
+            'score' => 92,
+            'max_score' => 100,
+            'grade_letter' => 'A',
+            'recorded_by' => $teacherUser->id,
+        ]);
+
+        $tuition = FeeStructure::create([
+            'name' => 'Annual Tuition',
+            'academic_year_id' => $academicYear->id,
+            'grade_level' => '10',
+            'amount' => 5000.00,
+            'due_date' => '2025-10-01',
+            'description' => 'Annual tuition fee for Grade 10',
+            'is_active' => true,
+        ]);
+
+        FeePayment::create([
+            'student_id' => $student->id,
+            'fee_structure_id' => $tuition->id,
+            'amount_paid' => 2500.00,
+            'payment_date' => now()->subDays(5)->toDateString(),
+            'payment_method' => 'bank_transfer',
+            'status' => 'paid',
+            'receipt_number' => 'RCP-SEED0001',
+            'recorded_by' => $admin->id,
+        ]);
+
+        Announcement::create([
+            'title' => 'Welcome to the New Academic Year',
+            'body' => 'We are excited to welcome all students and staff to the 2025-2026 academic year. Classes begin September 1st.',
+            'target_audience' => 'all',
+            'priority' => 'high',
+            'is_published' => true,
+            'published_at' => now()->subDays(2),
+            'published_by' => $admin->id,
+        ]);
+
+        Announcement::create([
+            'title' => 'Parent-Teacher Meeting',
+            'body' => 'Parent-teacher meetings are scheduled for next Friday. Please check your class timetable.',
+            'target_audience' => 'all',
+            'priority' => 'normal',
+            'is_published' => true,
+            'published_at' => now()->subDay(),
+            'published_by' => $admin->id,
         ]);
     }
 }

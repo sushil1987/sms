@@ -3,8 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useAuthStore } from '../store/authStore';
 import type { AcademicYear, ClassSection, PaginatedResponse, Subject, TimetableEntry } from '../types';
-import './Forms.css';
-import './ResourceList.css';
+import PageHeader from '../components/ui/PageHeader';
+import Button from '../components/ui/Button';
+import '../components/ui/DataTable.css';
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -94,15 +95,12 @@ export default function Timetable() {
       }, {});
 
   return (
-    <div className="resource-page">
-      <header className="page-header">
-        <h1>Timetable</h1>
-        {isAdmin && (
-          <button type="button" className="btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'Add Entry'}
-          </button>
-        )}
-      </header>
+    <div>
+      <PageHeader
+        title="Timetable"
+        subtitle="Weekly class schedules"
+        action={isAdmin ? <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Add Entry'}</Button> : undefined}
+      />
 
       {!isStudent && (
         <div className="filters">

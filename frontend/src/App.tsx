@@ -12,6 +12,11 @@ import Enrollments from './pages/Enrollments';
 import Attendance from './pages/Attendance';
 import Grades from './pages/Grades';
 import Timetable from './pages/Timetable';
+import AcademicYears from './pages/AcademicYears';
+import Fees from './pages/Fees';
+import Announcements from './pages/Announcements';
+import Documents from './pages/Documents';
+import AuditLogs from './pages/AuditLogs';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import { useAuthStore } from './store/authStore';
@@ -41,14 +46,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
+      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<RoleDashboard />} />
         <Route path="students" element={<Students />} />
         <Route path="teachers" element={<Teachers />} />
@@ -58,6 +56,11 @@ function AppRoutes() {
         <Route path="attendance" element={<Attendance />} />
         <Route path="grades" element={<Grades />} />
         <Route path="timetable" element={<Timetable />} />
+        <Route path="academic-years" element={<AcademicYears />} />
+        <Route path="fees" element={<Fees />} />
+        <Route path="announcements" element={<Announcements />} />
+        <Route path="documents" element={<Documents />} />
+        <Route path="audit-logs" element={<AuditLogs />} />
       </Route>
     </Routes>
   );

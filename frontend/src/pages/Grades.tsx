@@ -3,8 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useAuthStore } from '../store/authStore';
 import type { AcademicYear, ClassSection, Grade, PaginatedResponse, Student, Subject } from '../types';
-import './Forms.css';
-import './ResourceList.css';
+import PageHeader from '../components/ui/PageHeader';
+import Button from '../components/ui/Button';
+import '../components/ui/DataTable.css';
 
 export default function Grades() {
   const { user } = useAuthStore();
@@ -80,13 +81,12 @@ export default function Grades() {
   };
 
   return (
-    <div className="resource-page">
-      <header className="page-header">
-        <h1>Grades</h1>
-        <button type="button" className="btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'Record Grade'}
-        </button>
-      </header>
+    <div>
+      <PageHeader
+        title="Grades"
+        subtitle="Record and manage exam results"
+        action={<Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Record Grade'}</Button>}
+      />
 
       {message && <div className={`message ${saveMutation.isError ? 'error' : 'success'}`}>{message}</div>}
 

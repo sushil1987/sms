@@ -1,55 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
-import './ResourceList.css';
-
-interface Teacher {
-  id: number;
-  employee_id: string;
-  department: string;
-  user: { name: string; email: string };
-}
-
-interface PaginatedResponse {
-  data: Teacher[];
-}
+import PageHeader from '../components/ui/PageHeader';
+import DataTable from '../components/ui/DataTable';
+import '../components/ui/DataTable.css';
 
 export default function Teachers() {
   const { data, isLoading } = useQuery({
     queryKey: ['teachers'],
-    queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse>('/teachers');
-      return data;
-    },
+    queryFn: async () => (await api.get('/teachers')).data,
   });
 
   return (
-    <div className="resource-page">
-      <header>
-        <h1>Teachers</h1>
-      </header>
-      {isLoading ? (
-        <p>Loading teachers...</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Department</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.data.map((teacher) => (
-              <tr key={teacher.id}>
-                <td>{teacher.employee_id}</td>
-                <td>{teacher.user.name}</td>
-                <td>{teacher.user.email}</td>
-                <td>{teacher.department}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div>
+      <PageHeader title="Teachers" subtitle="Faculty and staff management" />
+      {isLoading ? <p style={{ color: 'var(--text-muted)' }}>Loading...</p> : (
+        <DataTable
+          columns={[
+            { key: 'id', header: 'Employee ID', render: (r) => String(r.employee_id ?? '') },
+            { key: 'name', header: 'Name', render: (r) => (r.user as { name: string })?.name ?? '' },
+            { key: 'email', header: 'Email', render: (r) => (r.user as { email: string })?.email ?? '' },
+            { key: 'dept', header: 'Department', render: (r) => String(r.department ?? '') },
+          ]}
+          data={data?.data ?? []}
+        />
       )}
     </div>
   );

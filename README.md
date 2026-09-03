@@ -15,6 +15,8 @@ A full-stack School Management System built with **Laravel** (API backend) and *
 | **State** | Zustand | Auth state management |
 | **Data Fetching** | TanStack React Query | Server state, caching, refetching |
 | **HTTP Client** | Axios | API requests |
+| **Charts** | Recharts | Interactive analytics and graphs |
+| **Icons** | Lucide React | Modern icon system |
 
 ### Recommended Production Additions
 
@@ -67,11 +69,12 @@ sms/
 - [x] Student portal (dashboard, timetable, grades view)
 
 ### Phase 3 — Administration
-- [ ] Academic year management UI
-- [ ] Fee management and payment tracking
-- [ ] Announcements and notifications
-- [ ] Document uploads (certificates, ID cards)
-- [ ] Audit logs
+- [x] Academic year management UI
+- [x] Fee management and payment tracking
+- [x] Announcements and notifications
+- [x] Document uploads (certificates, ID cards)
+- [x] Audit logs
+- [x] Modern UI redesign with charts and analytics dashboards
 
 ### Phase 4 — Parent & Student Portals
 - [ ] Parent dashboard (child attendance, grades, fees)

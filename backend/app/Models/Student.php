@@ -47,4 +47,9 @@ class Student extends Model
     {
         return $this->hasMany(Grade::class);
     }
+
+    public function documents(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }

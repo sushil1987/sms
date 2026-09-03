@@ -1,9 +1,12 @@
 import { type FormEvent, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
+import PageHeader from '../components/ui/PageHeader';
+import Button from '../components/ui/Button';
+import Badge from '../components/ui/Badge';
+import DataTable from '../components/ui/DataTable';
 import type { AcademicYear, ClassSection, Enrollment, PaginatedResponse, Student } from '../types';
-import './Forms.css';
-import './ResourceList.css';
+import '../components/ui/DataTable.css';
 
 export default function Enrollments() {
   const queryClient = useQueryClient();
@@ -49,13 +52,12 @@ export default function Enrollments() {
   };
 
   return (
-    <div className="resource-page">
-      <header className="page-header">
-        <h1>Enrollments</h1>
-        <button type="button" className="btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'Enroll Student'}
-        </button>
-      </header>
+    <div>
+      <PageHeader
+        title="Enrollments"
+        subtitle="Assign students to classes"
+        action={<Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Enroll Student'}</Button>}
+      />
 
       {message && <div className={`message ${enrollMutation.isError ? 'error' : 'success'}`}>{message}</div>}
 
@@ -90,37 +92,25 @@ export default function Enrollments() {
               </select>
             </label>
           </div>
-          <button type="submit" className="btn-primary" disabled={enrollMutation.isPending} style={{ marginTop: '1rem' }}>
+          <Button type="submit" disabled={enrollMutation.isPending} style={{ marginTop: '1rem' }}>
             {enrollMutation.isPending ? 'Saving...' : 'Enroll'}
-          </button>
+          </Button>
         </form>
       )}
 
       {isLoading ? (
-        <p>Loading enrollments...</p>
+        <p style={{ color: 'var(--text-muted)' }}>Loading...</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Admission #</th>
-              <th>Class</th>
-              <th>Academic Year</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {enrollments?.data.map((e) => (
-              <tr key={e.id}>
-                <td>{e.student.user.name}</td>
-                <td>{e.student.admission_number}</td>
-                <td>{e.class_section.name}</td>
-                <td>{e.academic_year.name}</td>
-                <td><span className={`status status-${e.status}`}>{e.status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable
+          columns={[
+            { key: 'student', header: 'Student', render: (r) => (r as unknown as Enrollment).student.user.name },
+            { key: 'admission', header: 'Admission #', render: (r) => (r as unknown as Enrollment).student.admission_number },
+            { key: 'class', header: 'Class', render: (r) => (r as unknown as Enrollment).class_section.name },
+            { key: 'year', header: 'Academic Year', render: (r) => (r as unknown as Enrollment).academic_year.name },
+            { key: 'status', header: 'Status', render: (r) => <Badge variant={(r as unknown as Enrollment).status === 'active' ? 'success' : 'default'}>{(r as unknown as Enrollment).status}</Badge> },
+          ]}
+          data={enrollments?.data as unknown as Record<string, unknown>[] ?? []}
+        />
       )}
     </div>
   );
