@@ -131,6 +131,7 @@ Frontend runs at `http://localhost:5173`
 | Admin | admin@school.local | password |
 | Teacher | teacher@school.local | password |
 | Student | student@school.local | password |
+| Parent | parent@school.local | password |
 
 ---
 
@@ -152,6 +153,8 @@ Frontend runs at `http://localhost:5173`
 | CRUD | `/api/timetables` | Class timetables | Admin |
 | GET | `/api/teacher/*` | Teacher portal | Teacher |
 | GET | `/api/student/*` | Student portal | Student |
+| GET | `/api/parent/*` | Parent portal | Parent |
+| GET | `/api/notifications` | Notifications (in-app, email, SMS) | All roles |
 
 ---
 
