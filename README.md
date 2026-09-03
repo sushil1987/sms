@@ -130,6 +130,7 @@ Frontend runs at `http://localhost:5173`
 |------|-------|----------|
 | Admin | admin@school.local | password |
 | Principal | principal@school.local | password |
+| Accountant | accountant@school.local | password |
 | Teacher | teacher@school.local | password |
 | Student | student@school.local | password |
 | Parent | parent@school.local | password |
@@ -140,6 +141,7 @@ Frontend runs at `http://localhost:5173`
 |------|------------------|
 | **Admin** | Full system access (students, fees, library, transport, reports, etc.) |
 | **Principal** | Manage teachers, assign class teachers, build timetables |
+| **Accountant** | Collect fees, record payments, view revenue summaries |
 | **Teacher** | Attendance, grades, class portal |
 | **Student** | View own records and timetable |
 | **Parent** | View children's attendance, grades, and fees |

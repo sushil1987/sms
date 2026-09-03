@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Plus, DollarSign } from 'lucide-react';
 import api from '../lib/api';
+import { useAuthStore } from '../store/authStore';
 import PageHeader from '../components/ui/PageHeader';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
@@ -14,8 +15,11 @@ import '../components/ui/DataTable.css';
 import '../components/ui/ChartCard.css';
 
 export default function Fees() {
+  const { user } = useAuthStore();
+  const isAccountant = user?.role?.slug === 'accountant';
+  const canManageStructures = user?.role?.slug === 'admin';
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<'structures' | 'payments'>('structures');
+  const [tab, setTab] = useState<'structures' | 'payments'>(isAccountant ? 'payments' : 'structures');
   const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState('');
   const [structForm, setStructForm] = useState({ name: '', academic_year_id: '', grade_level: '', amount: '', due_date: '' });
@@ -39,6 +43,7 @@ export default function Fees() {
   const { data: years } = useQuery({
     queryKey: ['academic-years'],
     queryFn: async () => (await api.get<AcademicYear[]>('/academic-years')).data,
+    enabled: canManageStructures,
   });
 
   const { data: students } = useQuery({
@@ -53,12 +58,12 @@ export default function Fees() {
 
   const payMutation = useMutation({
     mutationFn: (p: Record<string, unknown>) => api.post('/fee-payments', p),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['fee-payments', 'fee-summary'] }); setShowForm(false); setMessage('Payment recorded.'); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['fee-payments', 'fee-summary', 'accountant-dashboard'] }); setShowForm(false); setMessage('Payment recorded.'); },
   });
 
   return (
     <div>
-      <PageHeader title="Fee Management" subtitle="Structures, payments, and revenue tracking" />
+      <PageHeader title={isAccountant ? 'Fee Collection' : 'Fee Management'} subtitle={isAccountant ? 'Record payments and view collection history' : 'Structures, payments, and revenue tracking'} />
 
       <div className="stat-grid">
         <StatCard title="Total Collected" value={`$${Number(summary?.total_collected ?? 0).toLocaleString()}`} icon={DollarSign} color="emerald" />
@@ -79,14 +84,16 @@ export default function Fees() {
       </ChartCard>
 
       <div className="tabs" style={{ marginTop: '1.5rem' }}>
-        <button type="button" className={tab === 'structures' ? 'active' : ''} onClick={() => setTab('structures')}>Fee Structures</button>
+        {canManageStructures && (
+          <button type="button" className={tab === 'structures' ? 'active' : ''} onClick={() => setTab('structures')}>Fee Structures</button>
+        )}
         <button type="button" className={tab === 'payments' ? 'active' : ''} onClick={() => setTab('payments')}>Payments</button>
-        <Button onClick={() => setShowForm(!showForm)} style={{ marginLeft: 'auto' }}><Plus size={16} /> Add</Button>
+        <Button onClick={() => setShowForm(!showForm)} style={{ marginLeft: 'auto' }}><Plus size={16} /> {showForm ? 'Cancel' : tab === 'payments' || isAccountant ? 'Record Payment' : 'Add'}</Button>
       </div>
 
       {message && <div className="message success">{message}</div>}
 
-      {showForm && tab === 'structures' && (
+      {showForm && tab === 'structures' && canManageStructures && (
         <form className="form-card" onSubmit={(e) => { e.preventDefault(); structMutation.mutate({ ...structForm, academic_year_id: Number(structForm.academic_year_id), amount: Number(structForm.amount) }); }}>
           <div className="form-grid">
             <label>Name<input value={structForm.name} onChange={(e) => setStructForm({ ...structForm, name: e.target.value })} required /></label>
@@ -112,7 +119,7 @@ export default function Fees() {
         </form>
       )}
 
-      {tab === 'structures' ? (
+      {tab === 'structures' && canManageStructures ? (
         <DataTable
           columns={[
             { key: 'name', header: 'Name' },

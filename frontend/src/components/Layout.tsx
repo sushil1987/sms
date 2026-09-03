@@ -32,6 +32,11 @@ const adminNav = [
   { to: '/reports', icon: BarChart3, label: 'Reports' },
 ];
 
+const accountantNav = [
+  { to: '/', icon: LayoutDashboard, label: 'Portal', end: true },
+  { to: '/fees', icon: DollarSign, label: 'Fees' },
+];
+
 const principalNav = [
   { to: '/', icon: LayoutDashboard, label: 'Portal', end: true },
   { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
@@ -63,6 +68,7 @@ export default function Layout() {
 
   const nav = role === 'admin' ? adminNav
     : role === 'principal' ? principalNav
+    : role === 'accountant' ? accountantNav
     : role === 'teacher' ? teacherNav
     : role === 'parent' ? parentNav
     : studentNav;

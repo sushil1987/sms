@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AccountantPortalController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AttendanceController;
@@ -77,14 +78,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/grades/report-card/{student}', [GradeController::class, 'reportCard'])
         ->middleware('role:admin,teacher,student');
 
+    Route::middleware('role:admin,accountant')->group(function () {
+        Route::get('/students', [StudentController::class, 'index']);
+        Route::get('/fee-structures', [FeeStructureController::class, 'index']);
+        Route::get('/fee-payments/summary', [FeePaymentController::class, 'summary']);
+        Route::apiResource('fee-payments', FeePaymentController::class)->only(['index', 'store', 'show']);
+    });
+
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('students', StudentController::class);
+        Route::apiResource('students', StudentController::class)->except(['index']);
         Route::apiResource('subjects', SubjectController::class)->except(['index']);
         Route::apiResource('enrollments', EnrollmentController::class);
         Route::apiResource('academic-years', AcademicYearController::class)->except(['index']);
-        Route::apiResource('fee-structures', FeeStructureController::class);
-        Route::get('/fee-payments/summary', [FeePaymentController::class, 'summary']);
-        Route::apiResource('fee-payments', FeePaymentController::class)->only(['index', 'store', 'show']);
+        Route::apiResource('fee-structures', FeeStructureController::class)->except(['index']);
         Route::apiResource('announcements', AnnouncementController::class)->except(['index']);
         Route::apiResource('documents', DocumentController::class)->except(['update']);
         Route::get('/documents/{document}/download', [DocumentController::class, 'download']);
@@ -116,6 +122,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('principal')->middleware('role:principal')->group(function () {
         Route::get('/dashboard', [PrincipalPortalController::class, 'dashboard']);
+    });
+
+    Route::prefix('accountant')->middleware('role:accountant')->group(function () {
+        Route::get('/dashboard', [AccountantPortalController::class, 'dashboard']);
     });
 
     Route::prefix('teacher')->middleware('role:teacher')->group(function () {

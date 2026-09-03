@@ -22,6 +22,7 @@ import Library from './pages/Library';
 import Transport from './pages/Transport';
 import Hostel from './pages/Hostel';
 import Reports from './pages/Reports';
+import AccountantDashboard from './pages/AccountantDashboard';
 import PrincipalDashboard from './pages/PrincipalDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
@@ -40,6 +41,7 @@ function RoleDashboard() {
   const role = useAuthStore((s) => s.user?.role?.slug);
   if (role === 'teacher') return <TeacherDashboard />;
   if (role === 'principal') return <PrincipalDashboard />;
+  if (role === 'accountant') return <AccountantDashboard />;
   if (role === 'student') return <StudentDashboard />;
   if (role === 'parent') return <ParentDashboard />;
   return <Dashboard />;
