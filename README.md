@@ -77,10 +77,10 @@ sms/
 - [x] Modern UI redesign with charts and analytics dashboards
 
 ### Phase 4 — Parent & Student Portals
-- [ ] Parent dashboard (child attendance, grades, fees)
+- [x] Parent dashboard (child attendance, grades, fees)
 - [x] Student self-service (timetable, results)
-- [ ] Email/SMS notifications
-- [ ] Mobile-responsive design
+- [x] Email/SMS notifications (in-app + email + SMS logging)
+- [x] Mobile-responsive design (hamburger menu, bottom nav, responsive charts)
 
 ### Phase 5 — Advanced Features
 - [ ] Library management

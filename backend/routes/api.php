@@ -11,7 +11,8 @@ use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\FeePaymentController;
 use App\Http\Controllers\Api\FeeStructureController;
-use App\Http\Controllers\Api\GradeController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ParentPortalController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentPortalController;
 use App\Http\Controllers\Api\SubjectController;
@@ -39,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('role:admin,teacher,student,parent');
 
     Route::get('/timetables', [TimetableController::class, 'index'])
-        ->middleware('role:admin,teacher,student');
+        ->middleware('role:admin,teacher,student,parent');
 
     // Academic operations — admin & teacher
     Route::middleware('role:admin,teacher')->group(function () {
@@ -81,6 +82,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/classes', [TeacherPortalController::class, 'classes']);
         Route::get('/classes/{classSection}/students', [TeacherPortalController::class, 'classStudents']);
         Route::get('/classes/{classSection}/timetable', [TeacherPortalController::class, 'classTimetable']);
+    });
+
+    // Notifications — all authenticated users
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+
+    // Parent portal
+    Route::prefix('parent')->middleware('role:parent')->group(function () {
+        Route::get('/dashboard', [ParentPortalController::class, 'dashboard']);
+        Route::get('/children', [ParentPortalController::class, 'children']);
+        Route::get('/children/{student}/attendance', [ParentPortalController::class, 'childAttendance']);
+        Route::get('/children/{student}/grades', [ParentPortalController::class, 'childGrades']);
+        Route::get('/children/{student}/fees', [ParentPortalController::class, 'childFees']);
+        Route::get('/children/{student}/timetable', [ParentPortalController::class, 'childTimetable']);
     });
 
     // Student portal

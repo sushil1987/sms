@@ -19,6 +19,7 @@ export default function Timetable() {
   const role = user?.role?.slug;
   const isAdmin = role === 'admin';
   const isStudent = role === 'student';
+  const isParent = role === 'parent';
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [classFilter, setClassFilter] = useState('');
@@ -32,6 +33,17 @@ export default function Timetable() {
     queryKey: ['student-timetable-view'],
     queryFn: async () => (await api.get<StudentTimetableData>('/student/timetable')).data,
     enabled: isStudent,
+  });
+
+  const { data: parentTimetable } = useQuery({
+    queryKey: ['parent-timetable-view'],
+    queryFn: async () => {
+      const children = (await api.get('/parent/children')).data;
+      const firstChild = children[0];
+      if (!firstChild) return null;
+      return (await api.get(`/parent/children/${firstChild.id}/timetable`)).data;
+    },
+    enabled: isParent,
   });
 
   const { data: timetables } = useQuery({
@@ -87,6 +99,8 @@ export default function Timetable() {
 
   const grouped = isStudent
     ? (studentTimetable?.timetable ?? {})
+    : isParent
+    ? (parentTimetable?.timetable ?? {})
     : (timetables?.data ?? []).reduce<Record<string, TimetableEntry[]>>((acc, entry) => {
         const day = entry.day_of_week;
         acc[day] = acc[day] ?? [];
@@ -102,7 +116,7 @@ export default function Timetable() {
         action={isAdmin ? <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Add Entry'}</Button> : undefined}
       />
 
-      {!isStudent && (
+      {!isStudent && !isParent && (
         <div className="filters">
           <select value={classFilter} onChange={(e) => setClassFilter(e.target.value)}>
             <option value="">All classes</option>
@@ -111,8 +125,11 @@ export default function Timetable() {
         </div>
       )}
 
-      {isStudent && studentTimetable?.class && (
+      {(isStudent && studentTimetable?.class) && (
         <p style={{ color: '#64748b', marginBottom: '1rem' }}>Class: {studentTimetable.class.name}</p>
+      )}
+      {(isParent && parentTimetable?.class) && (
+        <p style={{ color: '#64748b', marginBottom: '1rem' }}>Class: {parentTimetable.class.name}</p>
       )}
 
       {message && <div className={`message ${saveMutation.isError ? 'error' : 'success'}`}>{message}</div>}
@@ -171,7 +188,7 @@ export default function Timetable() {
               </tr>
             </thead>
             <tbody>
-              {grouped[day].map((entry) => (
+              {grouped[day].map((entry: TimetableEntry) => (
                 <tr key={entry.id}>
                   <td>{entry.start_time?.slice(0, 5)} - {entry.end_time?.slice(0, 5)}</td>
                   <td>{entry.subject.name}</td>

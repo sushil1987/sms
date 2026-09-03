@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Enrollment;
+use App\Models\ParentGuardian;
+use App\Models\Student;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -111,7 +114,38 @@ class AttendanceController extends Controller
             }
         });
 
+        foreach ($data['records'] as $record) {
+            if ($record['status'] === 'absent') {
+                $this->notifyParentsOfAbsence($record['student_id'], $data['date']);
+            }
+        }
+
         return response()->json(['message' => 'Attendance saved successfully.']);
+    }
+
+    private function notifyParentsOfAbsence(int $studentId, string $date): void
+    {
+        $student = Student::with('user')->find($studentId);
+        if (! $student) {
+            return;
+        }
+
+        $parents = ParentGuardian::whereHas('students', fn ($q) => $q->where('students.id', $studentId))
+            ->with('user')
+            ->get();
+
+        foreach ($parents as $parent) {
+            if ($parent->user) {
+                NotificationService::send(
+                    $parent->user,
+                    'attendance',
+                    'Attendance Alert',
+                    "{$student->user->name} was marked absent on ".date('M d, Y', strtotime($date)).'.',
+                    ['student_id' => $studentId, 'date' => $date],
+                    ['in_app', 'email', 'sms'],
+                );
+            }
+        }
     }
 
     public function report(Request $request): JsonResponse

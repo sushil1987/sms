@@ -71,6 +71,7 @@ export default function Login() {
               <span>admin@school.local</span>
               <span>teacher@school.local</span>
               <span>student@school.local</span>
+              <span>parent@school.local</span>
             </div>
             <small>Password: password</small>
           </div>

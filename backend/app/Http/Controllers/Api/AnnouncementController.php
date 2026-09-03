@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Services\AuditService;
+use App\Services\NotificationService;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,7 +25,9 @@ class AnnouncementController extends Controller
 
         if ($request->filled('audience')) {
             $audience = $request->string('audience');
-            $query->where(fn ($q) => $q->where('target_audience', 'all')->orWhere('target_audience', $audience));
+            $query->where(function ($q) use ($audience) {
+                $q->where('target_audience', 'all')->orWhere('target_audience', $audience);
+            });
         }
 
         return response()->json($query->paginate(15));
@@ -49,6 +53,10 @@ class AnnouncementController extends Controller
 
         AuditService::log('created', $announcement, null, $announcement->toArray());
 
+        if ($announcement->is_published) {
+            $this->dispatchAnnouncementNotifications($announcement);
+        }
+
         return response()->json($announcement->load('publishedBy'), 201);
     }
 
@@ -72,9 +80,14 @@ class AnnouncementController extends Controller
             $data['published_at'] = now();
         }
 
+        $wasPublished = $announcement->is_published;
         $old = $announcement->toArray();
         $announcement->update($data);
         AuditService::log('updated', $announcement, $old, $announcement->fresh()->toArray());
+
+        if ($announcement->is_published && ! $wasPublished) {
+            $this->dispatchAnnouncementNotifications($announcement);
+        }
 
         return response()->json($announcement->load('publishedBy'));
     }
@@ -85,5 +98,25 @@ class AnnouncementController extends Controller
         $announcement->delete();
 
         return response()->json(['message' => 'Announcement deleted.']);
+    }
+
+    private function dispatchAnnouncementNotifications(Announcement $announcement): void
+    {
+        $message = $announcement->body;
+        $title = $announcement->title;
+
+        if ($announcement->target_audience === 'all') {
+            User::each(fn (User $user) => NotificationService::send(
+                $user, 'announcement', $title, $message, ['announcement_id' => $announcement->id]
+            ));
+        } else {
+            NotificationService::sendToRole(
+                $announcement->target_audience,
+                'announcement',
+                $title,
+                $message,
+                ['announcement_id' => $announcement->id]
+            );
+        }
     }
 }

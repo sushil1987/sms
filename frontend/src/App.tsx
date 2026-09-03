@@ -19,6 +19,7 @@ import Documents from './pages/Documents';
 import AuditLogs from './pages/AuditLogs';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import ParentDashboard from './pages/ParentDashboard';
 import { useAuthStore } from './store/authStore';
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ function RoleDashboard() {
   const role = useAuthStore((s) => s.user?.role?.slug);
   if (role === 'teacher') return <TeacherDashboard />;
   if (role === 'student') return <StudentDashboard />;
+  if (role === 'parent') return <ParentDashboard />;
   return <Dashboard />;
 }
 

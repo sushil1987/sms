@@ -10,12 +10,15 @@ use App\Models\Enrollment;
 use App\Models\FeePayment;
 use App\Models\FeeStructure;
 use App\Models\Grade;
+use App\Models\ParentGuardian;
 use App\Models\Role;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Timetable;
 use App\Models\User;
+use App\Models\UserNotification;
+use App\Services\NotificationService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,6 +36,7 @@ class DatabaseSeeder extends Seeder
         $adminRole = $roles->firstWhere('slug', 'admin');
         $teacherRole = $roles->firstWhere('slug', 'teacher');
         $studentRole = $roles->firstWhere('slug', 'student');
+        $parentRole = $roles->firstWhere('slug', 'parent');
 
         $admin = User::create([
             'name' => 'System Admin',
@@ -202,5 +206,38 @@ class DatabaseSeeder extends Seeder
             'published_at' => now()->subDay(),
             'published_by' => $admin->id,
         ]);
+
+        $parentUser = User::create([
+            'name' => 'Robert Doe',
+            'email' => 'parent@school.local',
+            'password' => Hash::make('password'),
+            'role_id' => $parentRole->id,
+            'phone' => '+1-555-0200',
+        ]);
+
+        $parent = ParentGuardian::create([
+            'user_id' => $parentUser->id,
+            'relationship' => 'father',
+            'occupation' => 'Engineer',
+        ]);
+
+        $parent->students()->attach($student->id, ['is_primary' => true]);
+
+        NotificationService::send(
+            $parentUser,
+            'welcome',
+            'Welcome to EduSphere Parent Portal',
+            'You can now track John Doe\'s attendance, grades, and fees from your dashboard.',
+            ['student_id' => $student->id],
+        );
+
+        NotificationService::send(
+            $parentUser,
+            'attendance',
+            'Attendance Alert',
+            'John Doe was marked absent on '.now()->subDays(5)->format('M d, Y').'.',
+            ['student_id' => $student->id],
+            ['in_app', 'email', 'sms'],
+        );
     }
 }
