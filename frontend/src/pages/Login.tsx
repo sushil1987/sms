@@ -69,6 +69,7 @@ export default function Login() {
             <p>Demo accounts</p>
             <div className="demo-tags">
               <span>admin@school.local</span>
+              <span>principal@school.local</span>
               <span>teacher@school.local</span>
               <span>student@school.local</span>
               <span>parent@school.local</span>

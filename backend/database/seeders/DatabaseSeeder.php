@@ -39,12 +39,14 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Teacher', 'slug' => 'teacher', 'description' => 'Manage classes, attendance, and grades'],
             ['name' => 'Student', 'slug' => 'student', 'description' => 'View own records'],
             ['name' => 'Parent', 'slug' => 'parent', 'description' => 'View child records'],
+            ['name' => 'Principal', 'slug' => 'principal', 'description' => 'Manage teachers, classes, and staff assignments'],
         ])->map(fn ($role) => Role::create($role));
 
         $adminRole = $roles->firstWhere('slug', 'admin');
         $teacherRole = $roles->firstWhere('slug', 'teacher');
         $studentRole = $roles->firstWhere('slug', 'student');
         $parentRole = $roles->firstWhere('slug', 'parent');
+        $principalRole = $roles->firstWhere('slug', 'principal');
 
         $admin = User::create([
             'name' => 'System Admin',
@@ -52,6 +54,14 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role_id' => $adminRole->id,
             'phone' => '+1-555-0100',
+        ]);
+
+        User::create([
+            'name' => 'Dr. Sarah Johnson',
+            'email' => 'principal@school.local',
+            'password' => Hash::make('password'),
+            'role_id' => $principalRole->id,
+            'phone' => '+1-555-0150',
         ]);
 
         $school = School::create([

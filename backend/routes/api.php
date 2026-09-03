@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\HostelController;
 use App\Http\Controllers\Api\HostelRoomController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ParentPortalController;
+use App\Http\Controllers\Api\PrincipalPortalController;
 use App\Http\Controllers\Api\ReportsController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\StudentController;
@@ -41,17 +42,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/analytics', [DashboardController::class, 'analytics'])
         ->middleware('role:admin');
 
-    Route::middleware('role:admin,teacher')->group(function () {
+    Route::middleware('role:admin,principal,teacher')->group(function () {
         Route::get('/subjects', [SubjectController::class, 'index']);
         Route::get('/academic-years', [AcademicYearController::class, 'index']);
+    });
+
+    Route::middleware('role:admin,teacher')->group(function () {
         Route::get('/schools', [SchoolController::class, 'index']);
+    });
+
+    Route::middleware('role:admin,principal')->group(function () {
+        Route::apiResource('teachers', TeacherController::class);
+        Route::apiResource('classes', ClassSectionController::class);
+        Route::apiResource('timetables', TimetableController::class)->except(['index']);
     });
 
     Route::get('/announcements', [AnnouncementController::class, 'index'])
         ->middleware('role:admin,teacher,student,parent');
 
     Route::get('/timetables', [TimetableController::class, 'index'])
-        ->middleware('role:admin,teacher,student,parent');
+        ->middleware('role:admin,principal,teacher,student,parent');
 
     Route::middleware('role:admin,teacher')->group(function () {
         Route::get('/attendance', [AttendanceController::class, 'index']);
@@ -69,11 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('students', StudentController::class);
-        Route::apiResource('teachers', TeacherController::class);
-        Route::apiResource('classes', ClassSectionController::class);
         Route::apiResource('subjects', SubjectController::class)->except(['index']);
         Route::apiResource('enrollments', EnrollmentController::class);
-        Route::apiResource('timetables', TimetableController::class)->except(['index']);
         Route::apiResource('academic-years', AcademicYearController::class)->except(['index']);
         Route::apiResource('fee-structures', FeeStructureController::class);
         Route::get('/fee-payments/summary', [FeePaymentController::class, 'summary']);
@@ -105,6 +112,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/hostel', [ReportsController::class, 'hostel']);
             Route::get('/schools', [ReportsController::class, 'schools']);
         });
+    });
+
+    Route::prefix('principal')->middleware('role:principal')->group(function () {
+        Route::get('/dashboard', [PrincipalPortalController::class, 'dashboard']);
     });
 
     Route::prefix('teacher')->middleware('role:teacher')->group(function () {

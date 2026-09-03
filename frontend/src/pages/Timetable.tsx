@@ -17,7 +17,7 @@ interface StudentTimetableData {
 export default function Timetable() {
   const { user } = useAuthStore();
   const role = user?.role?.slug;
-  const isAdmin = role === 'admin';
+  const canManageTimetable = role === 'admin' || role === 'principal';
   const isStudent = role === 'student';
   const isParent = role === 'parent';
   const queryClient = useQueryClient();
@@ -57,7 +57,7 @@ export default function Timetable() {
   const { data: classes } = useQuery({
     queryKey: ['timetable-classes'],
     queryFn: async () => {
-      const endpoint = isAdmin ? '/classes' : '/teacher/classes';
+      const endpoint = canManageTimetable ? '/classes' : '/teacher/classes';
       const { data } = await api.get<ClassSection[] | PaginatedResponse<ClassSection>>(endpoint);
       return Array.isArray(data) ? data : data.data;
     },
@@ -66,13 +66,19 @@ export default function Timetable() {
   const { data: subjects } = useQuery({
     queryKey: ['subjects-list'],
     queryFn: async () => (await api.get<PaginatedResponse<Subject>>('/subjects')).data,
-    enabled: isAdmin,
+    enabled: canManageTimetable,
+  });
+
+  const { data: teachers } = useQuery({
+    queryKey: ['teachers-list'],
+    queryFn: async () => (await api.get('/teachers')).data,
+    enabled: canManageTimetable,
   });
 
   const { data: years } = useQuery({
     queryKey: ['academic-years'],
     queryFn: async () => (await api.get<AcademicYear[]>('/academic-years')).data,
-    enabled: isAdmin,
+    enabled: canManageTimetable,
   });
 
   const saveMutation = useMutation({
@@ -113,7 +119,7 @@ export default function Timetable() {
       <PageHeader
         title="Timetable"
         subtitle="Weekly class schedules"
-        action={isAdmin ? <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Add Entry'}</Button> : undefined}
+        action={canManageTimetable ? <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Add Entry'}</Button> : undefined}
       />
 
       {!isStudent && !isParent && (
@@ -134,7 +140,7 @@ export default function Timetable() {
 
       {message && <div className={`message ${saveMutation.isError ? 'error' : 'success'}`}>{message}</div>}
 
-      {showForm && isAdmin && (
+      {showForm && canManageTimetable && (
         <form className="form-card" onSubmit={handleSubmit}>
           <div className="form-grid">
             <label>Class
@@ -147,6 +153,14 @@ export default function Timetable() {
               <select value={form.subject_id} onChange={(e) => setForm({ ...form, subject_id: e.target.value })} required>
                 <option value="">Select subject</option>
                 {subjects?.data.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </label>
+            <label>Teacher
+              <select value={form.teacher_id} onChange={(e) => setForm({ ...form, teacher_id: e.target.value })}>
+                <option value="">Select teacher</option>
+                {teachers?.data?.map((t: { user: { id: number; name: string } }) => (
+                  <option key={t.user.id} value={t.user.id}>{t.user.name}</option>
+                ))}
               </select>
             </label>
             <label>Academic Year

@@ -22,6 +22,7 @@ import Library from './pages/Library';
 import Transport from './pages/Transport';
 import Hostel from './pages/Hostel';
 import Reports from './pages/Reports';
+import PrincipalDashboard from './pages/PrincipalDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
@@ -38,6 +39,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function RoleDashboard() {
   const role = useAuthStore((s) => s.user?.role?.slug);
   if (role === 'teacher') return <TeacherDashboard />;
+  if (role === 'principal') return <PrincipalDashboard />;
   if (role === 'student') return <StudentDashboard />;
   if (role === 'parent') return <ParentDashboard />;
   return <Dashboard />;
