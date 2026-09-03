@@ -129,9 +129,20 @@ Frontend runs at `http://localhost:5173`
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@school.local | password |
+| Principal | principal@school.local | password |
 | Teacher | teacher@school.local | password |
 | Student | student@school.local | password |
 | Parent | parent@school.local | password |
+
+### Role Permissions
+
+| Role | Key capabilities |
+|------|------------------|
+| **Admin** | Full system access (students, fees, library, transport, reports, etc.) |
+| **Principal** | Manage teachers, assign class teachers, build timetables |
+| **Teacher** | Attendance, grades, class portal |
+| **Student** | View own records and timetable |
+| **Parent** | View children's attendance, grades, and fees |
 
 ---
 
