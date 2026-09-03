@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ClassSection extends Model
 {
     protected $fillable = [
+        'school_id',
         'academic_year_id',
         'name',
         'grade_level',
@@ -16,6 +17,11 @@ class ClassSection extends Model
         'capacity',
         'class_teacher_id',
     ];
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function academicYear(): BelongsTo
     {

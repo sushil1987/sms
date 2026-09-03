@@ -5,20 +5,31 @@ use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BookController;
+use App\Http\Controllers\Api\BookIssueController;
 use App\Http\Controllers\Api\ClassSectionController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\FeePaymentController;
 use App\Http\Controllers\Api\FeeStructureController;
+use App\Http\Controllers\Api\GradeController;
+use App\Http\Controllers\Api\HostelAllocationController;
+use App\Http\Controllers\Api\HostelController;
+use App\Http\Controllers\Api\HostelRoomController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ParentPortalController;
+use App\Http\Controllers\Api\ReportsController;
+use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentPortalController;
+use App\Http\Controllers\Api\StudentTransportController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\TeacherPortalController;
 use App\Http\Controllers\Api\TimetableController;
+use App\Http\Controllers\Api\TransportRouteController;
+use App\Http\Controllers\Api\VehicleController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,10 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/analytics', [DashboardController::class, 'analytics'])
         ->middleware('role:admin');
 
-    // Shared read access
     Route::middleware('role:admin,teacher')->group(function () {
         Route::get('/subjects', [SubjectController::class, 'index']);
         Route::get('/academic-years', [AcademicYearController::class, 'index']);
+        Route::get('/schools', [SchoolController::class, 'index']);
     });
 
     Route::get('/announcements', [AnnouncementController::class, 'index'])
@@ -42,13 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/timetables', [TimetableController::class, 'index'])
         ->middleware('role:admin,teacher,student,parent');
 
-    // Academic operations — admin & teacher
     Route::middleware('role:admin,teacher')->group(function () {
         Route::get('/attendance', [AttendanceController::class, 'index']);
         Route::get('/attendance/sheet', [AttendanceController::class, 'classSheet']);
         Route::post('/attendance/bulk', [AttendanceController::class, 'bulkStore']);
         Route::get('/attendance/report', [AttendanceController::class, 'report']);
-
         Route::get('/grades', [GradeController::class, 'index']);
         Route::post('/grades', [GradeController::class, 'store']);
         Route::put('/grades/{grade}', [GradeController::class, 'update']);
@@ -58,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/grades/report-card/{student}', [GradeController::class, 'reportCard'])
         ->middleware('role:admin,teacher,student');
 
-    // Admin-only management
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('students', StudentController::class);
         Route::apiResource('teachers', TeacherController::class);
@@ -74,9 +82,31 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('documents', DocumentController::class)->except(['update']);
         Route::get('/documents/{document}/download', [DocumentController::class, 'download']);
         Route::get('/audit-logs', [AuditLogController::class, 'index']);
+
+        // Phase 5 — Advanced
+        Route::apiResource('schools', SchoolController::class)->except(['index']);
+        Route::apiResource('books', BookController::class);
+        Route::get('/book-issues', [BookIssueController::class, 'index']);
+        Route::post('/book-issues/issue', [BookIssueController::class, 'issue']);
+        Route::post('/book-issues/{bookIssue}/return', [BookIssueController::class, 'returnBook']);
+        Route::apiResource('transport-routes', TransportRouteController::class);
+        Route::apiResource('vehicles', VehicleController::class);
+        Route::apiResource('student-transports', StudentTransportController::class)->only(['index', 'store', 'destroy']);
+        Route::apiResource('hostels', HostelController::class);
+        Route::apiResource('hostel-rooms', HostelRoomController::class)->except(['show']);
+        Route::get('/hostel-allocations', [HostelAllocationController::class, 'index']);
+        Route::post('/hostel-allocations', [HostelAllocationController::class, 'store']);
+        Route::post('/hostel-allocations/{hostelAllocation}/vacate', [HostelAllocationController::class, 'vacate']);
+
+        Route::prefix('reports')->group(function () {
+            Route::get('/overview', [ReportsController::class, 'overview']);
+            Route::get('/library', [ReportsController::class, 'library']);
+            Route::get('/transport', [ReportsController::class, 'transport']);
+            Route::get('/hostel', [ReportsController::class, 'hostel']);
+            Route::get('/schools', [ReportsController::class, 'schools']);
+        });
     });
 
-    // Teacher portal
     Route::prefix('teacher')->middleware('role:teacher')->group(function () {
         Route::get('/dashboard', [TeacherPortalController::class, 'dashboard']);
         Route::get('/classes', [TeacherPortalController::class, 'classes']);
@@ -84,12 +114,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/classes/{classSection}/timetable', [TeacherPortalController::class, 'classTimetable']);
     });
 
-    // Notifications — all authenticated users
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
-    // Parent portal
     Route::prefix('parent')->middleware('role:parent')->group(function () {
         Route::get('/dashboard', [ParentPortalController::class, 'dashboard']);
         Route::get('/children', [ParentPortalController::class, 'children']);
@@ -99,7 +127,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/children/{student}/timetable', [ParentPortalController::class, 'childTimetable']);
     });
 
-    // Student portal
     Route::prefix('student')->middleware('role:student')->group(function () {
         Route::get('/dashboard', [StudentPortalController::class, 'dashboard']);
         Route::get('/attendance', [StudentPortalController::class, 'attendance']);

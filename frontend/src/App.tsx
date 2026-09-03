@@ -17,6 +17,11 @@ import Fees from './pages/Fees';
 import Announcements from './pages/Announcements';
 import Documents from './pages/Documents';
 import AuditLogs from './pages/AuditLogs';
+import Schools from './pages/Schools';
+import Library from './pages/Library';
+import Transport from './pages/Transport';
+import Hostel from './pages/Hostel';
+import Reports from './pages/Reports';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
@@ -63,6 +68,11 @@ function AppRoutes() {
         <Route path="announcements" element={<Announcements />} />
         <Route path="documents" element={<Documents />} />
         <Route path="audit-logs" element={<AuditLogs />} />
+        <Route path="schools" element={<Schools />} />
+        <Route path="library" element={<Library />} />
+        <Route path="transport" element={<Transport />} />
+        <Route path="hostel" element={<Hostel />} />
+        <Route path="reports" element={<Reports />} />
       </Route>
     </Routes>
   );

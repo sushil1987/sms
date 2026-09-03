@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, GraduationCap, BookOpen, Layers,
   ClipboardList, CalendarCheck, Award, Clock, Megaphone,
   DollarSign, FileText, ScrollText, Calendar, LogOut, School,
-  Menu, X, Heart,
+  Menu, X, Heart, Building2, Library, Bus, Home, BarChart3,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import NotificationBell from './NotificationBell';
@@ -25,6 +25,11 @@ const adminNav = [
   { to: '/announcements', icon: Megaphone, label: 'Announcements' },
   { to: '/documents', icon: FileText, label: 'Documents' },
   { to: '/audit-logs', icon: ScrollText, label: 'Audit Logs' },
+  { to: '/schools', icon: Building2, label: 'Schools' },
+  { to: '/library', icon: Library, label: 'Library' },
+  { to: '/transport', icon: Bus, label: 'Transport' },
+  { to: '/hostel', icon: Home, label: 'Hostel' },
+  { to: '/reports', icon: BarChart3, label: 'Reports' },
 ];
 
 const teacherNav = [

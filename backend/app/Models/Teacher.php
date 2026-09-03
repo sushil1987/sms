@@ -9,6 +9,7 @@ class Teacher extends Model
 {
     protected $fillable = [
         'user_id',
+        'school_id',
         'employee_id',
         'department',
         'qualification',
@@ -26,5 +27,10 @@ class Teacher extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 }

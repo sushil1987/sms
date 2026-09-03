@@ -83,11 +83,11 @@ sms/
 - [x] Mobile-responsive design (hamburger menu, bottom nav, responsive charts)
 
 ### Phase 5 — Advanced Features
-- [ ] Library management
-- [ ] Transport management
-- [ ] Hostel management
-- [ ] Analytics and reporting dashboards
-- [ ] Multi-school support
+- [x] Library management
+- [x] Transport management
+- [x] Hostel management
+- [x] Analytics and reporting dashboards
+- [x] Multi-school support
 
 ---
 

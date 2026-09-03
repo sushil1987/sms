@@ -1,3 +1,11 @@
+export interface School {
+  id: number;
+  name: string;
+  code: string;
+  city?: string;
+  is_active?: boolean;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   current_page: number;
