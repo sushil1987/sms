@@ -16,7 +16,13 @@ class EnsureUserHasRole
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
-        if (! in_array($user->role->slug, $roles, true)) {
+        $allowedRoles = collect($roles)
+            ->flatMap(fn (string $role) => explode(',', $role))
+            ->map(fn (string $role) => trim($role))
+            ->filter()
+            ->all();
+
+        if (! in_array($user->role->slug, $allowedRoles, true)) {
             return response()->json(['message' => 'Forbidden. Insufficient permissions.'], 403);
         }
 

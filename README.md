@@ -59,11 +59,12 @@ sms/
 - [x] Seed data for development
 
 ### Phase 2 — Academic Operations
-- [ ] Enrollment management (assign students to classes)
-- [ ] Attendance recording and reports
-- [ ] Grade/result entry and report cards
-- [ ] Timetable scheduling
-- [ ] Teacher portal (class-specific views)
+- [x] Enrollment management (assign students to classes)
+- [x] Attendance recording and reports
+- [x] Grade/result entry and report cards
+- [x] Timetable scheduling
+- [x] Teacher portal (class-specific views)
+- [x] Student portal (dashboard, timetable, grades view)
 
 ### Phase 3 — Administration
 - [ ] Academic year management UI
@@ -74,7 +75,7 @@ sms/
 
 ### Phase 4 — Parent & Student Portals
 - [ ] Parent dashboard (child attendance, grades, fees)
-- [ ] Student self-service (timetable, results)
+- [x] Student self-service (timetable, results)
 - [ ] Email/SMS notifications
 - [ ] Mobile-responsive design
 

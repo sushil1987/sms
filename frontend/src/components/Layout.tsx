@@ -4,6 +4,7 @@ import './Layout.css';
 
 export default function Layout() {
   const { user, logout } = useAuthStore();
+  const role = user?.role?.slug;
 
   return (
     <div className="layout">
@@ -13,13 +14,31 @@ export default function Layout() {
           <p>School Management</p>
         </div>
         <nav>
-          <NavLink to="/" end>Dashboard</NavLink>
-          {user?.role?.slug === 'admin' && (
+          {role === 'admin' && (
             <>
+              <NavLink to="/" end>Dashboard</NavLink>
               <NavLink to="/students">Students</NavLink>
               <NavLink to="/teachers">Teachers</NavLink>
               <NavLink to="/classes">Classes</NavLink>
               <NavLink to="/subjects">Subjects</NavLink>
+              <NavLink to="/enrollments">Enrollments</NavLink>
+              <NavLink to="/attendance">Attendance</NavLink>
+              <NavLink to="/grades">Grades</NavLink>
+              <NavLink to="/timetable">Timetable</NavLink>
+            </>
+          )}
+          {role === 'teacher' && (
+            <>
+              <NavLink to="/" end>My Portal</NavLink>
+              <NavLink to="/attendance">Attendance</NavLink>
+              <NavLink to="/grades">Grades</NavLink>
+              <NavLink to="/timetable">Timetable</NavLink>
+            </>
+          )}
+          {role === 'student' && (
+            <>
+              <NavLink to="/" end>My Dashboard</NavLink>
+              <NavLink to="/timetable">Timetable</NavLink>
             </>
           )}
         </nav>

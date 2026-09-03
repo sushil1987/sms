@@ -3,11 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\AcademicYear;
+use App\Models\Attendance;
 use App\Models\ClassSection;
+use App\Models\Enrollment;
+use App\Models\Grade;
 use App\Models\Role;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\Timetable;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -42,12 +46,10 @@ class DatabaseSeeder extends Seeder
             'is_current' => true,
         ]);
 
-        $subjects = collect([
-            ['name' => 'Mathematics', 'code' => 'MATH101'],
-            ['name' => 'English', 'code' => 'ENG101'],
-            ['name' => 'Science', 'code' => 'SCI101'],
-            ['name' => 'History', 'code' => 'HIS101'],
-        ])->each(fn ($s) => Subject::create($s));
+        $math = Subject::create(['name' => 'Mathematics', 'code' => 'MATH101']);
+        $english = Subject::create(['name' => 'English', 'code' => 'ENG101']);
+        Subject::create(['name' => 'Science', 'code' => 'SCI101']);
+        Subject::create(['name' => 'History', 'code' => 'HIS101']);
 
         $teacherUser = User::create([
             'name' => 'Jane Smith',
@@ -82,7 +84,7 @@ class DatabaseSeeder extends Seeder
             'role_id' => $studentRole->id,
         ]);
 
-        Student::create([
+        $student = Student::create([
             'user_id' => $studentUser->id,
             'admission_number' => 'STU-2025-001',
             'date_of_birth' => '2010-03-15',
@@ -91,6 +93,56 @@ class DatabaseSeeder extends Seeder
             'guardian_phone' => '+1-555-0200',
             'admission_date' => '2025-09-01',
             'status' => 'active',
+        ]);
+
+        Enrollment::create([
+            'student_id' => $student->id,
+            'class_section_id' => $classSection->id,
+            'academic_year_id' => $academicYear->id,
+            'enrolled_at' => '2025-09-01',
+            'status' => 'active',
+        ]);
+
+        Timetable::create([
+            'class_section_id' => $classSection->id,
+            'subject_id' => $math->id,
+            'teacher_id' => $teacherUser->id,
+            'academic_year_id' => $academicYear->id,
+            'day_of_week' => 'monday',
+            'start_time' => '09:00',
+            'end_time' => '09:45',
+            'room' => 'Room 101',
+        ]);
+
+        Timetable::create([
+            'class_section_id' => $classSection->id,
+            'subject_id' => $english->id,
+            'teacher_id' => $teacherUser->id,
+            'academic_year_id' => $academicYear->id,
+            'day_of_week' => 'monday',
+            'start_time' => '10:00',
+            'end_time' => '10:45',
+            'room' => 'Room 101',
+        ]);
+
+        Attendance::create([
+            'student_id' => $student->id,
+            'class_section_id' => $classSection->id,
+            'date' => now()->toDateString(),
+            'status' => 'present',
+            'recorded_by' => $teacherUser->id,
+        ]);
+
+        Grade::create([
+            'student_id' => $student->id,
+            'subject_id' => $math->id,
+            'class_section_id' => $classSection->id,
+            'academic_year_id' => $academicYear->id,
+            'exam_type' => 'Midterm',
+            'score' => 88,
+            'max_score' => 100,
+            'grade_letter' => 'B',
+            'recorded_by' => $teacherUser->id,
         ]);
     }
 }

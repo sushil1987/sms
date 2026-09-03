@@ -8,6 +8,12 @@ import Students from './pages/Students';
 import Teachers from './pages/Teachers';
 import Classes from './pages/Classes';
 import Subjects from './pages/Subjects';
+import Enrollments from './pages/Enrollments';
+import Attendance from './pages/Attendance';
+import Grades from './pages/Grades';
+import Timetable from './pages/Timetable';
+import TeacherDashboard from './pages/TeacherDashboard';
+import StudentDashboard from './pages/StudentDashboard';
 import { useAuthStore } from './store/authStore';
 
 const queryClient = new QueryClient();
@@ -16,6 +22,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
   if (!token) return <Navigate to="/login" replace />;
   return <>{children}</>;
+}
+
+function RoleDashboard() {
+  const role = useAuthStore((s) => s.user?.role?.slug);
+  if (role === 'teacher') return <TeacherDashboard />;
+  if (role === 'student') return <StudentDashboard />;
+  return <Dashboard />;
 }
 
 function AppRoutes() {
@@ -36,11 +49,15 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Dashboard />} />
+        <Route index element={<RoleDashboard />} />
         <Route path="students" element={<Students />} />
         <Route path="teachers" element={<Teachers />} />
         <Route path="classes" element={<Classes />} />
         <Route path="subjects" element={<Subjects />} />
+        <Route path="enrollments" element={<Enrollments />} />
+        <Route path="attendance" element={<Attendance />} />
+        <Route path="grades" element={<Grades />} />
+        <Route path="timetable" element={<Timetable />} />
       </Route>
     </Routes>
   );
