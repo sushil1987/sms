@@ -143,6 +143,12 @@ Frontend runs at `http://localhost:5173`
 | CRUD | `/api/teachers` | Teacher management | Admin |
 | CRUD | `/api/classes` | Class sections | Admin |
 | CRUD | `/api/subjects` | Subjects | Admin |
+| CRUD | `/api/enrollments` | Student enrollments | Admin |
+| GET/POST | `/api/attendance/*` | Mark attendance & reports | Admin, Teacher |
+| GET/POST | `/api/grades` | Grade entry & report cards | Admin, Teacher |
+| CRUD | `/api/timetables` | Class timetables | Admin |
+| GET | `/api/teacher/*` | Teacher portal | Teacher |
+| GET | `/api/student/*` | Student portal | Student |
 
 ---
 
@@ -155,7 +161,7 @@ roles ──< users ──< teachers
               │              └──< grades >── subjects
               └── (class_teacher on class_sections)
 
-academic_years ──< class_sections
+academic_years ──< class_sections ──< timetables
               └──< enrollments, grades
 ```
 
